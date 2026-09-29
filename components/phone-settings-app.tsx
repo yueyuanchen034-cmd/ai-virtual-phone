@@ -585,6 +585,33 @@ export function PhoneSettingsApp({ onClose, onNotice }: SettingsPageProps) {
                                                 </span>
                                                 <span className="menu-right"><ChevronRight size={17} className="settings-account-chevron" /></span>
                                             </button>
+                                            <button type="button" className="menu-item settings-tools-menu-item w-full text-left border-t border-[var(--c-border-light)] mt-1 pt-1" onClick={async () => {
+                                                setAccountSheetOpen(false);
+                                                const targetUsername = account.username === "user01" ? "user02" : "user01";
+                                                try {
+                                                    // 快捷切换：自动尝试用对端账号和固定密码 123456 跨账号登录
+                                                    //（此设置方便自部署的双开/分身小号切换；可根据需要自行在注册时设置相同密码）
+                                                    const { loginAccount } = await import("@/lib/account-client");
+                                                    const res = await loginAccount({ username: targetUsername, password: "123456" });
+                                                    if (res.ok && res.account) {
+                                                        onNotice(`正在切换到小号 @${targetUsername}...`);
+                                                        window.location.reload();
+                                                    } else {
+                                                        onNotice(`快捷切换失败：请确保已注册小号 @${targetUsername} 且密码为 123456。`);
+                                                    }
+                                                } catch (err) {
+                                                    onNotice("快捷切换失败：账号模块加载异常。");
+                                                }
+                                            }}>
+                                                <span className="card-icon" style={passwordIconStyle}>
+                                                    <RefreshCw size={22} strokeWidth={1.75} />
+                                                </span>
+                                                <span className="settings-tools-menu-copy">
+                                                    <span className="menu-label appearance-menu-item-label" style={{ color: "var(--c-link)" }}>一键切换分身/小号</span>
+                                                    <span className="menu-desc settings-tools-menu-desc">在 @user01 和 @user02 间快速闪切 (密码需为123456)</span>
+                                                </span>
+                                                <span className="menu-right"><ChevronRight size={17} className="settings-account-chevron" /></span>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
